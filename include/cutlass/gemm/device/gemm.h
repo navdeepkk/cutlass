@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include<iostream>
+
 #include "cutlass/cutlass.h"
 #include "cutlass/numeric_types.h"
 #include "cutlass/arch/arch.h"
@@ -466,7 +468,26 @@ public:
       }
     }
 
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    cudaEventRecord(start); 
+
     cutlass::Kernel<GemmKernel><<<grid, block, smem_size, stream>>>(params_);
+    
+    cudaEventRecord(stop);
+
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    
+  
+    std::cout<<"TIME TAKEN: "<<milliseconds<<" ms"<<std::endl;
+    double ops = params_.problem_size.m() * params_.problem_size.n() * params_.problem_size.k();
+    ops = (((ops * 2 * 1000) / milliseconds) / 1e12);
+
+    std::cout<<"PERF: "<<ops<<std::endl;
 
     result = cudaGetLastError();
 

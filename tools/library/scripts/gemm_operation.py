@@ -84,6 +84,7 @@ class GemmOperation:
 
       inst_shape = "%d%d%d" % tuple(self.tile_description.math_instruction.instruction_shape)
       inst_shape += math_op_string
+      inst_shape += "%d%d%d" % tuple(self.tile_description.warp_count) 
 
       if self.tile_description.math_instruction.element_a != self.A.element and \
         self.tile_description.math_instruction.element_a != self.tile_description.math_instruction.element_accumulator:
