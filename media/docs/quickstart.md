@@ -161,6 +161,7 @@ compiled as C++11 or greater.
 #include <iostream>
 #include <cutlass/cutlass.h>
 #include <cutlass/numeric_types.h>
+#include <cutlass/core_io.h>
 
 int main() {
 
@@ -174,10 +175,13 @@ int main() {
 
 ## Launching a GEMM kernel in CUDA
 
-**Example:** launch a mixed-precision GEMM targeting Turing Tensor Cores.
+**Example:** launch a mixed-precision GEMM targeting Turing Tensor Cores. 
+
+_Note, this example uses CUTLASS Utilities. Be sure `tools/util/include` is listed as an include path._
 ```c++
 #include <cutlass/numeric_types.h>
 #include <cutlass/gemm/device/gemm.h>
+
 #include <cutlass/util/host_tensor.h>
 
 int main() {
@@ -399,7 +403,7 @@ $ cmake .. -DCUTLASS_NVCC_ARCHS=75 -DCUTLASS_LIBRARY_KERNELS=sgemm
 Compling only the kernels desired reduces compilation time.
 
 To instantiate kernels of all tile sizes, data types, and alignment constraints, specify 
-`-DCUTLASS_LIBRARY_KERNELS=all` when running `cmake`.
+`-DCUTLASS_LIBRARY_KERNELS=all` when running `cmake`. 
 
 Several recipes are defined below for convenience. They may be combined as a comma-delimited list.
 
@@ -408,9 +412,12 @@ Several recipes are defined below for convenience. They may be combined as a com
 $ cmake .. -DCUTLASS_NVCC_ARCHS=80 -DCUTLASS_LIBRARY_KERNELS=tensorop*gemm
 ```
 
-**Example.** All kernels for NVIDIA Volta, Turing, and Ampere architectures.
+**Example.** All kernels for NVIDIA Volta, Turing, and Ampere architectures. Enabling 
+the "unity build" instantiates multiple kernel instances in each compilation unit, thereby
+reducing binary size and avoiding linker limitations on some platforms.
 ```bash
-$ cmake .. -DCUTLASS_NVCC_ARCHS="70;75;80" -DCUTLASS_LIBRARY_KERNELS=all
+$ cmake .. -DCUTLASS_NVCC_ARCHS="70;75;80" -DCUTLASS_LIBRARY_KERNELS=all \
+   -DCUTLASS_UNITY_BUILD_ENABLED=ON
 ```
 
 **Example.** All GEMM kernels targeting Turing Tensor Cores.
